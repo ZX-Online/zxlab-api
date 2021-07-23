@@ -1,0 +1,119 @@
+<html>
+<head>
+    <!--
+    // I want to use jQuery just to have some syntax sugar
+    // It will make the code shorter
+    -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- // Also we will need a wrapper library to access ZXLab API
+    // It's pretty simple, btw
+    // Currently this library can only send bytes to ZX Spectrum memory
+    // but it's enough for today's demonstration :)
+    -->
+    <script src="zxlab_api.js"></script>
+    <!-- Let's add some custom code here
+    -->
+    <script type="text/Javascript">
+    jQuery(document).ready(function()
+    {
+        // This code will be run immediately when the HTML page completely loaded and initialized
+        // Let's add the BUTTON to run our piece of the code
+        // Let's add the handler for onClick event
+
+        // We need to initialize the API object
+        // It needs to know where our emulator was initialized
+        var zxlab = new ZXLab_API(document.getElementById('zxlab'));
+
+        jQuery('#btn').on('click', function()
+        {
+            // This code will be executed on each button click
+            // Okay, now we can use zxlab object to send commands
+
+            /*
+            // Very simple application: let's send just one byte to the ZX Spectrum video memory!
+            zxlab.setMemoryBlock(0x4005, [0xaa]);
+
+            // Wow, do you see that?!
+            // How about a bit more complex application?
+            // Let's draw a face of 8 bytes
+            // We going to send 8 bytes in one API call
+            zxlab.setMemoryBlocks([
+                [0x4000, [0x3c]],
+                [0x4100, [0x42]],
+                [0x4200, [0x81]], 
+                [0x4300, [0xa5]], 
+                [0x4400, [0x81]], 
+                [0x4500, [0x99]], 
+                [0x4600, [0x42]], 
+                [0x4700, [0x3c]],
+                // Let's colorize it
+                [0x5800, [0xb8]],   // Let's go flash
+            ]);
+            */
+            
+            // How about some more complex example?
+            // Ready to something complex?
+
+            // let's fill the whole ZX screen by "/" and "\" symbols randomly
+            // to get a feeling of a complex labyrinth
+            var chars = [
+                [0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01],   // Wall "\"
+                [0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80],   // Wall "/"
+            ];
+
+            // We going to walk on Y from 0 to 23 and then on X from 0 to 31
+            var blocks = [];
+            var gfx = [];
+            for (var y = 0; y < 24; y ++) {
+                // We need to calculate the "screen address" of the 
+                // current line in ZX screen video memory
+                var addr = 0x4000 + ((y & 0x18) << 8) + ((y & 0x07) << 5);
+                for (var x = 0; x < 32; x ++) {
+                    if (Math.random() >= 0.5) {
+                        // Wall "\"
+                        gfx = chars[0];
+                    } else {
+                        // Wall "/"
+                        gfx = chars[1];
+                    }
+                    // Now we need to draw the wall (8 bytes)
+                    for (var i in gfx) {
+                        blocks.push([
+                            addr + x + i * 0x100,
+                            [gfx[i]]
+                        ]);
+                    }
+                }
+            }
+
+            // Okay, time to test!
+            // Aha! I forgot to send :)
+            zxlab.setMemoryBlocks(blocks);
+
+            // Great! It works.
+
+            // Okay, that's it for today.
+            // In the next video I going to show you 
+            // How we can control the spectrum, for example,
+            // we can put a real Z80 code to it's memory
+            // and then execute it
+            // also I will show you how to use breakpoints in the 
+            // z80 code to run javascript code etc etc
+
+            // Thanks for watching!
+
+            // Oh, you can get the code using the link in description
+            // to play it by yourself!
+            
+        });
+    });
+    </script>
+</head>
+<body>
+    <iframe id="zxlab" src="https://api.zxlab.org/v1/embed/sandbox?play=1&amp;debug=1" style="width:576px;height:448px" width="576" height="448" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen="true"></iframe>
+    <br>
+    <br>
+    <input type="button" value="Click Me" id="btn">
+</body>
+</html>
+
