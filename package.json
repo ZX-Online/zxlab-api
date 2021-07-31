@@ -1,0 +1,33 @@
+{
+  "name": "zxlab-api",
+  "version": "1.1.0",
+  "description": "The wrapper to access ZXLab API",
+  "main": "zxlab_api.js",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ZX-Online/zxlab-api.git"
+  },
+  "keywords": [
+    "zxlab",
+    "zx",
+    "spectrum",
+    "zxspectrum",
+    "zxnext",
+    "scorpion",
+    "pentagon",
+    "zx-uno",
+    "48k",
+    "128k"
+  ],
+  "author": "ZXOnline <info@zxonline.net>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ZX-Online/zxlab-api/issues"
+  },
+  "homepage": "https://github.com/ZX-Online/zxlab-api#readme"
+}
