@@ -8,7 +8,7 @@
  * 
  * @param {object} HTML IFRAME element pointer where the ZXLab emulator ran 
  */
-function ZXLab_API(emulator_element) 
+class ZXLab_API
 {
 	/*
 	// Codes of operations:
@@ -30,20 +30,30 @@ function ZXLab_API(emulator_element)
 	// 0xcd - call <address>
 	// 0xc9 - call return - sent by zxlab emulator
 	*/
-
-	this.el = emulator_element;
-
-	this.textTranslationTable = {};
-
-	this.send = function(data)
+	constructor(emulator_element, is_debug = false)
 	{
+		this.el = emulator_element;
+		this.is_debug = is_debug;
+
+		this.textTranslationTable = {};	
+	}
+
+	static attachTo(element, is_debug = false)
+	{
+		return new ZXLab_API(element, is_debug);
+	}
+
+	send(data)
+	{
+		if (this.is_debug) {
+			console.log('Sending data to ZXLab API: ');
+			console.log(data);	
+		}
+
 		this.el.contentWindow.postMessage(data, '*', [data.buffer]);
+	}
 
-		console.log('Sent data: ');
-		console.log(data);
-	};
-
-	this.sendOneByte = function(b)
+	sendOneByte(b)
 	{
 		var buf = new Uint8Array(3);
 
@@ -55,34 +65,34 @@ function ZXLab_API(emulator_element)
 		buf[i++] = b;	// One-byte command with no parameters
 
 		this.send(buf);
-	};
+	}
 
-	this.NMI = function()
+	NMI()
 	{
 		this.sendOneByte(0x51);	// NMI
 	}
 
-	this.reset = function()
+	reset()
 	{
 		this.sendOneByte(0x52);	// Reset
 	}
 
-	this.stopCPU = function()
+	stopCPU()
 	{
 		this.sendOneByte(0x53);	// Stop CPU
 	}
 
-	this.releaseCPU = function()
+	releaseCPU()
 	{
 		this.sendOneByte(0x54);	// Release CPU
 	}
 
-	this.setMemoryBlock = function(addr, data)
+	setMemoryBlock(addr, data)
 	{
 		return this.setMemoryBlocks([[addr, data]]);
-	};
+	}
 
-	this.setMemoryBlocks = function(blocks)
+	setMemoryBlocks(blocks)
 	{
 		// addr is always integer from 0x000000 to 0xffffff
 		// data can be integer, array, string or Uint8Array
@@ -95,16 +105,16 @@ function ZXLab_API(emulator_element)
 			var is_valid_block = true;
 			switch (tp) {
 				case 'number':
-					len ++;
+					len++;
 					break;
 				case 'string':
 					len += tp.length;
 					break;
 				case 'boolean':
-					len ++;
+					len++;
 					break;
 				default:
-				//'object':
+					//'object':
 					if (Array.isArray(data)) {
 						len += data.length;
 					} else {
@@ -121,8 +131,9 @@ function ZXLab_API(emulator_element)
 			}
 		}
 
+		var buf;
 		if (len > 5) {
-			var buf = new Uint8Array(len);
+			buf = new Uint8Array(len);
 			var i = 0;
 
 			// Add ZXLab API marker
@@ -144,7 +155,7 @@ function ZXLab_API(emulator_element)
 						buf[i++] = parseInt(data);
 						break;
 					case 'string':
-						for (var ii = 0; ii < data.length; ii ++) {
+						for (var ii = 0; ii < data.length; ii++) {
 							var ch = data.charCodeAt(ii);
 							buf[i++] = (ch in this.textTranslationTable) ? this.textTranslationTable[ch] : ch;
 						}
@@ -153,14 +164,14 @@ function ZXLab_API(emulator_element)
 						buf[i++] = data ? 1 : 0;
 						break;
 					default:
-					//'object':
+						//'object':
 						if (Array.isArray(data)) {
-							for (var ii = 0; ii < data.length; ii ++) {
+							for (var ii = 0; ii < data.length; ii++) {
 								buf[i++] = parseInt(data[ii]);
 							}
 						} else {
 							if (blk.constructor === Uint8Array) {
-								for (var ii = 0; ii < data.length; ii ++) {
+								for (var ii = 0; ii < data.length; ii++) {
 									buf[i++] = data[ii];
 								}
 							} else {
@@ -168,7 +179,7 @@ function ZXLab_API(emulator_element)
 							}
 						}
 				}
-	
+
 				if (is_valid_block) {
 					var len = i - i_blkstart - 5;
 
@@ -180,13 +191,15 @@ function ZXLab_API(emulator_element)
 					buf[i_blkstart++] = len & 0xff;
 					buf[i_blkstart++] = (len & 0xff00) >> 8;
 				}
-			}	
+			}
+
+			this.send(buf);
 		}
 
-		this.send(buf);
+		return false;
 	}
 
-	this.jump = function(adr)
+	jump(adr)
 	{
 		var buf = new Uint8Array(5);
 
@@ -199,11 +212,19 @@ function ZXLab_API(emulator_element)
 
 		buf[i++] = adr & 0x00ff;
 		buf[i++] = (adr >> 8) & 0x00ff;
-		
+
 		this.send(buf);
 	}
+};
 
-
+// UMD block
+if (typeof module === 'object' && module.exports) {
+	// Node.
+	module.exports = ZXLab_API;
+} else if (typeof define === 'function' && define.amd) {
+	// AMD. Register as an anonymous module.
+	define(['zxlab-api'], ZXLab_API);
+} else {
+	// Browser globals (root is window)
+	//window.ZXLab_API = ZXLab_API;
 }
-
-module.exports = ZXLab_API;
