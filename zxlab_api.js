@@ -50,7 +50,7 @@ class ZXLab_API
 			console.log(data);	
 		}
 
-		this.el.contentWindow.postMessage(data, '*', [data.buffer]);
+		this.el.contentWindow.postMessage(data.buffer, '*', [data.buffer]);
 	}
 
 	sendOneByte(b)

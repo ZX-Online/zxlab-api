@@ -10,7 +10,7 @@
     // Currently this library can only send bytes to ZX Spectrum memory
     // but it's enough for today's demonstration :)
     -->
-    <script src="https://cdn.jsdelivr.net/gh/ZX-Online/zxlab-api@latest/zxlab_api.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/ZX-Online/zxlab-api/zxlab_api.js"></script>
     
 	<!-- Let's add some custom code here -->
 
@@ -23,7 +23,7 @@
 
         // We need to initialize the API object
         // It needs to know where our emulator was initialized
-        var zxlab = new ZXLab_API(document.getElementById('zxlab'));
+        var zxlab = ZXLab_API.attachTo(document.getElementById('zxlab'), true);
 
         jQuery('#btn').on('click', function()
         {

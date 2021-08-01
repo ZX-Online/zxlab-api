@@ -9,7 +9,7 @@ To use this wrapper with React, please use `npm install` or `yarn add` (see belo
 You can connect this ZXLab API Wrapper to your browser using direct URL
 
 ```
-<script src="https://cdn.jsdelivr.net/gh/ZX-Online/zxlab-api@latest/zxlab_api.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/ZX-Online/zxlab-api/zxlab_api.js"></script>
 ```
 
 In case you're using React-based app, use 
