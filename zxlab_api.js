@@ -50,7 +50,8 @@ class ZXLab_API
 			console.log(data);	
 		}
 
-		this.el.contentWindow.postMessage(data.buffer, '*', [data.buffer]);
+		//this.el.contentWindow.postMessage(data.buffer, '*', [data.buffer]);
+		this.el.contentWindow.postMessage(data, '*');	// ArrayBuffer does not yet supported as transferable type
 	}
 
 	sendOneByte(b)
