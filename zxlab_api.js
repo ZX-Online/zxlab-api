@@ -100,6 +100,7 @@ class ZXLab_API
 
 		// Let's estimate the length of the resulting arraybuffer
 		var len = 0;
+		len += 2;	// 2 bytes for marker
 		for (var blk of blocks) {
 			var data = blk[1];
 			var tp = typeof data;
@@ -128,7 +129,7 @@ class ZXLab_API
 					}
 			}
 			if (is_valid_block) {
-				len += 5;
+				len += 6;	// Each header takes 6 bytes
 			}
 		}
 
@@ -141,10 +142,10 @@ class ZXLab_API
 			buf[i++] = 0x78;	// x
 			buf[i++] = 0x7a;	// z
 
-			buf[i++] = 0x55;	// SetMemoryBlock
-
 			for (var blk of blocks) {
 				var data = blk[1];
+
+				buf[i++] = 0x55;	// SetMemoryBlock
 
 				var i_blkstart = i;
 				i += 5;
@@ -171,7 +172,7 @@ class ZXLab_API
 								buf[i++] = parseInt(data[ii]);
 							}
 						} else {
-							if (blk.constructor === Uint8Array) {
+							if (data.constructor === Uint8Array) {
 								for (var ii = 0; ii < data.length; ii++) {
 									buf[i++] = data[ii];
 								}
