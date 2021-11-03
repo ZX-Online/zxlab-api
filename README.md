@@ -31,7 +31,7 @@ Use setMemoryBlocks directly from browser:
 https://www.youtube.com/watch?v=ikF-R_oMlnk
 
 Use blitMemoryBlocks
-**todo**
+https://www.youtube.com/watch?v=YjT6NEdG9og
 
 ## Contributing
 
